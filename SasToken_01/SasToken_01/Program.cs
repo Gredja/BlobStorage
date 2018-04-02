@@ -17,7 +17,7 @@ namespace SasToken_01
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
 
-            CloudBlobContainer container = blobClient.GetContainerReference("sascontainer03");
+            CloudBlobContainer container = blobClient.GetContainerReference("gredjacontainer");
 
             container.CreateIfNotExists();
 
@@ -30,23 +30,30 @@ namespace SasToken_01
             Console.WriteLine();
             Console.WriteLine($"local file path = {resourceFile.LocalFilePath}");
 
-            UseContainerSAS(containerSas);
+            UseContainerSAS(containerSas, resourceFile);
 
             Console.ReadLine();
         }
 
-        static void UseContainerSAS(string sas)
+        static void UseContainerSAS(string sas, ResourceFile resourceFile)
         {
             CloudBlobContainer container = new CloudBlobContainer(new Uri(sas));
 
-            List<ICloudBlob> blobList = new List<ICloudBlob>();
-
-            //Write operation: write a new blob to the container.
             try
             {
-                CloudBlockBlob blob = container.GetBlockBlobReference("blobCreatedViaSAS.txt");
-                string blobContent = "This blob was created with a shared access signature granting write permissions to the container. ";
-                blob.UploadText(blobContent);
+                CloudBlockBlob blob = container.GetBlockBlobReference(resourceFile.LocalFileName);
+
+
+                //using (var sourceData = new FileStream(resourceFile.LocalFilePath, FileMode.Open))
+                //{
+                //    blob.UploadFromStreamAsync(sourceData);
+                //}
+
+                //  blob.UploadText(blobContent);
+
+                MemoryStream randomDataForPut = RandomData(33 * 1024 * 1024);
+
+                blob.UploadFromStream(randomDataForPut);
 
                 Console.WriteLine("Write operation succeeded for SAS " + sas);
                 Console.WriteLine();
@@ -63,7 +70,7 @@ namespace SasToken_01
             {
                 foreach (ICloudBlob blob in container.ListBlobs())
                 {
-                    blobList.Add(blob);
+                   // blobList.Add(blob);
                 }
                 Console.WriteLine("List operation succeeded for SAS " + sas);
                 Console.WriteLine();
@@ -94,13 +101,31 @@ namespace SasToken_01
             return container.Uri + sasContainerToken;
         }
 
+        public static MemoryStream RandomData(long length)
+        {
+
+            var result = new MemoryStream();
+
+            Random r = new Random();
+
+            for (long i = 0; i < length; i++)
+
+                result.WriteByte((byte)(r.Next(256)));
+
+            result.Position = 0;
+
+            return result;
+
+        }
+
+
         private static ResourceFile CreateLocalFile()
         {
             string localPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             string localFileName = "gredja_" + Guid.NewGuid() + ".txt";
             var sourceFile = Path.Combine(localPath, localFileName);
             // Write text to the file.
-            File.WriteAllText(sourceFile, "Hello, World!");
+            File.WriteAllText(sourceFile, "Hello, gredja gredja v gredja gredja!");
 
             Console.WriteLine("Temp file = {0}", sourceFile);
 

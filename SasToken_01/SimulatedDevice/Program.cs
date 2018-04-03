@@ -1,12 +1,16 @@
 ﻿using System;
+using System.IO;
+using System.Security;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client;
 using Newtonsoft.Json;
+using SasToken_01;
 
 namespace SimulatedDevice
 {
-    internal class Program
+
+    public class Program
     {
         private static DeviceClient _deviceClient;
         private const string IotHubUri = "GredjaIoT.azure-devices.net";
@@ -14,11 +18,67 @@ namespace SimulatedDevice
 
         private static void Main(string[] args)
         {
+            var connectionString = Helpers.GetConnectionStringByName("IoTConnectionString");
+
             Console.WriteLine("Simulated device\n");
-            _deviceClient = DeviceClient.Create(IotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey("myFirstDevice", DeviceKey), TransportType.Mqtt);
-            _deviceClient.ProductInfo = "HappyPath_Simulated-CSharp";
-            SendDeviceToCloudMessagesAsync();
+            // _deviceClient = DeviceClient.Create(IotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey("GredjaDevice", DeviceKey));
+
+            _deviceClient = DeviceClient.CreateFromConnectionString(connectionString, "GredjaDevice", TransportType.Mqtt);
+
+
+             var resourceFile = CreateLocalFile();
+
+            if (resourceFile != null)
+            {
+                SendToBlobAsync(resourceFile).Wait();
+            }
+
+            //_deviceClient.ProductInfo = "HappyPath_Simulated-CSharp";
+            //SendDeviceToCloudMessagesAsync();
+
             Console.ReadLine();
+        }
+
+        private static ResourceFile CreateLocalFile()
+        {
+            string localPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string localFileName = "gredja_" + Guid.NewGuid() + ".txt";
+            var sourceFile = Path.Combine(localPath, localFileName);
+            // Write text to the file.
+            File.WriteAllText(sourceFile, "Hello, gredja gredja v gredja gredja!");
+
+            Console.WriteLine("Temp file = {0}", sourceFile);
+
+            return new ResourceFile { LocalFileName = localFileName, LocalFilePath = sourceFile };
+        }
+
+      private static async Task SendToBlobAsync(ResourceFile resourceFile)
+        {
+            Console.WriteLine("Uploading file: {0}", resourceFile.LocalFileName);
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+
+            MemoryStream inMemoryCopy = new MemoryStream();
+            using (var fs = new FileStream(resourceFile.LocalFilePath, FileMode.Open, FileAccess.Read))
+            {
+                fs.CopyTo(inMemoryCopy);
+
+                await _deviceClient.UploadToBlobAsync(resourceFile.LocalFileName, inMemoryCopy);
+            }
+
+           ;
+
+            //using (var sourceData = new FileStream(resourceFile.LocalFilePath, FileMode.Open, FileAccess.Read))
+            //{
+            //    await _deviceClient.UploadToBlobAsync(resourceFile.LocalFileName, sourceData);
+            //}
+
+            //using (var sourceData = new FileStream(@"image.jpg", FileMode.Open))
+            //{
+            //    await deviceClient.UploadToBlobAsync(fileName, sourceData);
+            //}
+
+            watch.Stop();
+            Console.WriteLine("Time to upload file: {0}ms\n", watch.ElapsedMilliseconds);
         }
 
         private static async void SendDeviceToCloudMessagesAsync()

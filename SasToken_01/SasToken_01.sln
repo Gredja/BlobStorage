@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatedDevice", "Simulate
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulateDeviceCore", "SimulateDeviceCore\SimulateDeviceCore.csproj", "{7E5A4E8E-0900-4D71-8797-4297C9EDC970}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReceiveNotificationCore", "ReceiveNotificationCore\ReceiveNotificationCore.csproj", "{1265CE29-5261-4E28-A53D-A2767E215217}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7E5A4E8E-0900-4D71-8797-4297C9EDC970}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E5A4E8E-0900-4D71-8797-4297C9EDC970}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E5A4E8E-0900-4D71-8797-4297C9EDC970}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1265CE29-5261-4E28-A53D-A2767E215217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1265CE29-5261-4E28-A53D-A2767E215217}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1265CE29-5261-4E28-A53D-A2767E215217}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1265CE29-5261-4E28-A53D-A2767E215217}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

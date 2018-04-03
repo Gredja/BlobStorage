@@ -1,31 +1,34 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Threading.Tasks;
+using System.Timers;
 using Microsoft.Azure.Devices.Client;
+using TransportType = Microsoft.Azure.Devices.Client.TransportType;
 
 namespace SimulateDeviceCore
 {
-    public class ResourceFile
-    {
-        public string LocalFileName { get; set; }
-        public string LocalFilePath { get; set; }
-    }
-
     class Program
     {
         private static DeviceClient _deviceClient;
 
         static void Main(string[] args)
         {
-            string returnValue = null;
-
-            var resourceFile = CreateLocalFile();
-
             // Look for the name in the connectionStrings section.
-            const string settings = "HostName=GredjaIoT.azure-devices.net;SharedAccessKeyName=GredjaIoT.azure-devices.net;SharedAccessKey=UlU/IIEXHNyk0Spz9bCw2ESyss2CjfR+ZhjGHEv4+78=";
+            const string connectionString =
+                            "HostName=GredjaIoT.azure-devices.net;SharedAccessKeyName=GredjaIoT.azure-devices.net;SharedAccessKey=UlU/IIEXHNyk0Spz9bCw2ESyss2CjfR+ZhjGHEv4+78=";
 
-            _deviceClient = DeviceClient.CreateFromConnectionString(settings, "GredjaDevice", TransportType.Mqtt);
+            _deviceClient = DeviceClient.CreateFromConnectionString(connectionString, "GredjaDevice", TransportType.Mqtt);
+
+            Timer timer = new Timer(4000);
+            timer.Elapsed += (sender, e) =>  HandleTimer().Wait();
+            timer.Start();
+            Console.Write("Press any key to exit... ");
+            Console.ReadKey();
+        }
+
+        private static async Task HandleTimer()
+        {
+            var resourceFile = CreateLocalFile();
 
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
@@ -49,7 +52,7 @@ namespace SimulateDeviceCore
 
             Console.WriteLine("Temp file = {0}", sourceFile);
 
-            return new ResourceFile { LocalFileName = localFileName, LocalFilePath = sourceFile };
+            return new ResourceFile {LocalFileName = localFileName, LocalFilePath = sourceFile};
         }
     }
 }

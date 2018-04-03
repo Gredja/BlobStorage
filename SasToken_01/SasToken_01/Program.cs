@@ -51,9 +51,18 @@ namespace SasToken_01
 
                 //  blob.UploadText(blobContent);
 
-                MemoryStream randomDataForPut = RandomData(33 * 1024 * 1024);
+                //using (MemoryStream randomDataForPut = RandomData(33 * 1024 * 1024))
+                //{
+                //    blob.UploadFromStream(randomDataForPut);
+                //}
 
-                blob.UploadFromStream(randomDataForPut);
+                MemoryStream inMemoryCopy = new MemoryStream();
+                using (FileStream fs = File.OpenRead(resourceFile.LocalFilePath))
+                {
+                    fs.CopyTo(inMemoryCopy);
+                }
+
+                blob.UploadFromStream(inMemoryCopy);
 
                 Console.WriteLine("Write operation succeeded for SAS " + sas);
                 Console.WriteLine();
@@ -70,7 +79,7 @@ namespace SasToken_01
             {
                 foreach (ICloudBlob blob in container.ListBlobs())
                 {
-                   // blobList.Add(blob);
+                    // blobList.Add(blob);
                 }
                 Console.WriteLine("List operation succeeded for SAS " + sas);
                 Console.WriteLine();

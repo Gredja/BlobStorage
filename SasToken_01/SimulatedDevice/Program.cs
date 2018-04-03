@@ -16,18 +16,15 @@ namespace SimulatedDevice
         private const string IotHubUri = "GredjaIoT.azure-devices.net";
         private const string DeviceKey = "y6xYf+VoH2RAqceofwuDJU5NMDmSIx26hTCQBcrBUC8=";
 
-        private static void Main(string[] args)
+        private  static void Main(string[] args)
         {
             var connectionString = Helpers.GetConnectionStringByName("IoTConnectionString");
 
             Console.WriteLine("Simulated device\n");
             // _deviceClient = DeviceClient.Create(IotHubUri, new DeviceAuthenticationWithRegistrySymmetricKey("GredjaDevice", DeviceKey));
 
-            _deviceClient = DeviceClient.CreateFromConnectionString(connectionString, "GredjaDevice", TransportType.Mqtt);
-
 
              var resourceFile = CreateLocalFile();
-
             if (resourceFile != null)
             {
                 SendToBlobAsync(resourceFile).Wait();
@@ -55,27 +52,13 @@ namespace SimulatedDevice
       private static async Task SendToBlobAsync(ResourceFile resourceFile)
         {
             Console.WriteLine("Uploading file: {0}", resourceFile.LocalFileName);
+            var dd  = DeviceClient.CreateFromConnectionString("HostName=GredjaIoT.azure-devices.net;DeviceId=GredjaDevice;SharedAccessKey=y6xYf+VoH2RAqceofwuDJU5NMDmSIx26hTCQBcrBUC8=", TransportType.Mqtt);
             var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            MemoryStream inMemoryCopy = new MemoryStream();
-            using (var fs = new FileStream(resourceFile.LocalFilePath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(@"e:\Work\BlobStorage\SasToken_01\SimulatedDevice\gredjaimg.jpg", FileMode.Open, FileAccess.Read))
             {
-                fs.CopyTo(inMemoryCopy);
-
-                await _deviceClient.UploadToBlobAsync(resourceFile.LocalFileName, inMemoryCopy);
+                dd.UploadToBlobAsync("dfgdfs", fs).Wait();
             }
-
-           ;
-
-            //using (var sourceData = new FileStream(resourceFile.LocalFilePath, FileMode.Open, FileAccess.Read))
-            //{
-            //    await _deviceClient.UploadToBlobAsync(resourceFile.LocalFileName, sourceData);
-            //}
-
-            //using (var sourceData = new FileStream(@"image.jpg", FileMode.Open))
-            //{
-            //    await deviceClient.UploadToBlobAsync(fileName, sourceData);
-            //}
 
             watch.Stop();
             Console.WriteLine("Time to upload file: {0}ms\n", watch.ElapsedMilliseconds);

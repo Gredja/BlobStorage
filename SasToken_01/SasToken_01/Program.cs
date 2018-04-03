@@ -41,26 +41,7 @@ namespace SasToken_01
 
             try
             {
-                CloudBlockBlob blob = container.GetBlockBlobReference(resourceFile.LocalFileName);
-
-
-                //using (var sourceData = new FileStream(resourceFile.LocalFilePath, FileMode.Open))
-                //{
-                //    blob.UploadFromStreamAsync(sourceData);
-                //}
-
-                //  blob.UploadText(blobContent);
-
-                //using (MemoryStream randomDataForPut = RandomData(33 * 1024 * 1024))
-                //{
-                //    blob.UploadFromStream(randomDataForPut);
-                //}
-
-                MemoryStream inMemoryCopy = new MemoryStream();
-                using (FileStream fs = File.OpenRead(resourceFile.LocalFilePath))
-                {
-                    fs.CopyTo(inMemoryCopy);
-                }
+                 container.GetBlockBlobReference(resourceFile.LocalFileName).UploadFromFile(resourceFile.LocalFilePath);
 
                 Console.WriteLine("Write operation succeeded for SAS " + sas);
                 Console.WriteLine();

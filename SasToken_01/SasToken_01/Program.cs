@@ -62,8 +62,6 @@ namespace SasToken_01
                     fs.CopyTo(inMemoryCopy);
                 }
 
-                blob.UploadFromStream(inMemoryCopy);
-
                 Console.WriteLine("Write operation succeeded for SAS " + sas);
                 Console.WriteLine();
             }
@@ -74,12 +72,13 @@ namespace SasToken_01
                 Console.WriteLine();
             }
 
-            //List operation: List the blobs in the container.
+            List<ICloudBlob> blobList = new List<ICloudBlob>();
+
             try
             {
                 foreach (ICloudBlob blob in container.ListBlobs())
                 {
-                    // blobList.Add(blob);
+                    blobList.Add(blob);
                 }
                 Console.WriteLine("List operation succeeded for SAS " + sas);
                 Console.WriteLine();

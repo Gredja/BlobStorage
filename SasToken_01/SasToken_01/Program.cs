@@ -12,7 +12,6 @@ namespace SasToken_01
     {
         static void Main(string[] args)
         {
-
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("StorageConnectionString"));
 
             CloudBlobClient blobClient = storageAccount.CreateCloudBlobClient();
